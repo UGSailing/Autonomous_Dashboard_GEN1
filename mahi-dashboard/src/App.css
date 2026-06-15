@@ -19,11 +19,16 @@ header {
     align-items: start;
 }
 
+.dashboard-sidebar {
+    display: grid;
+    gap: 20px;
+}
+
 .panel {
     text-align: left;
     border: 1px solid var(--border);
     border-radius: 18px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.48));
+    background: linear-gradient(180deg, var(--surface), var(--surface-2));
     box-shadow: var(--shadow);
     overflow: hidden;
     backdrop-filter: blur(14px);
@@ -40,6 +45,10 @@ header {
 }
 
 .panel-map {
+    padding-bottom: 18px;
+}
+
+.panel-speed {
     padding-bottom: 18px;
 }
 
@@ -62,7 +71,7 @@ header {
     inset: 0;
     display: grid;
     place-items: center;
-    background: rgba(10, 12, 18, 0.22);
+    background: rgba(7, 11, 20, 0.44);
     color: white;
     font-weight: 600;
     letter-spacing: 0.3px;
@@ -95,6 +104,67 @@ header {
     gap: 6px;
     padding: 0 18px;
     font-size: 14px;
+    color: var(--text);
+}
+
+.speed-dial {
+    --speed-progress: 0%;
+
+    width: min(100%, 220px);
+    aspect-ratio: 1 / 1;
+    margin: 16px auto 18px;
+}
+
+.speed-dial__ring {
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    background:
+        conic-gradient(var(--accent) 0 var(--speed-progress), rgba(255, 255, 255, 0.16) var(--speed-progress) 100%);
+    padding: 12px;
+    box-sizing: border-box;
+    position: relative;
+    box-shadow:
+        0 18px 36px rgba(15, 23, 42, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.speed-dial__ring::after {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.speed-dial__ring-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background:
+        radial-gradient(circle at 30% 20%, rgba(94, 234, 212, 0.16), transparent 34%),
+        linear-gradient(180deg, rgba(12, 18, 32, 0.98), rgba(9, 14, 26, 0.98));
+    text-align: center;
+}
+
+.speed-dial__value {
+    font-size: clamp(2.4rem, 9vw, 3.4rem);
+    line-height: 1;
+    color: #f8fbff;
+    letter-spacing: -0.04em;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.34);
+}
+
+.speed-dial__unit {
+    margin-top: -8px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(248, 251, 255, 0.78);
 }
 
 .empty-state {
@@ -108,19 +178,25 @@ header {
     margin: 0;
     display: grid;
     gap: 10px;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 .message-card {
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 12px;
-    background: rgba(255, 255, 255, 0.5);
+    background:
+        radial-gradient(circle at top right, rgba(15, 118, 110, 0.08), transparent 32%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(243, 247, 253, 0.96));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .message-topic {
-    font-size: 12px;
-    color: var(--text);
-    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--text-h);
+    font-weight: 700;
+    margin-bottom: 10px;
     word-break: break-word;
 }
 
@@ -128,8 +204,74 @@ header {
     margin: 0;
     white-space: pre-wrap;
     overflow: auto;
-    font-size: 12px;
-    max-height: 180px;
+    font-size: 13px;
+    max-height: 220px;
+    color: var(--text-h);
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    line-height: 1.5;
+}
+
+.topics-panel .panel-heading p,
+.topics-panel .empty-state {
+    color: var(--text-h);
+}
+
+.topics-panel .message-list {
+    scrollbar-color: var(--accent) var(--surface-2);
+}
+
+.topics-panel .message-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.topics-panel .message-list::-webkit-scrollbar-track {
+    background: var(--surface-2);
+    border-radius: 999px;
+}
+
+.topics-panel .message-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--accent), rgba(15, 118, 110, 0.72));
+    border-radius: 999px;
+    border: 2px solid var(--surface-2);
+}
+
+@media (prefers-color-scheme: dark) {
+    .message-card {
+        background:
+            radial-gradient(circle at top right, rgba(94, 234, 212, 0.08), transparent 32%),
+            linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 26, 46, 0.96));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .message-topic {
+        color: #f8fbff;
+    }
+
+    .message-payload {
+        background: rgba(9, 17, 31, 0.92);
+        border-color: #32445f;
+        color: #f8fbff;
+    }
+
+    .topics-panel .panel-heading p,
+    .topics-panel .empty-state {
+        color: #d5deeb;
+    }
+
+    .topics-panel .message-list {
+        scrollbar-color: var(--accent) rgba(17, 26, 46, 0.9);
+    }
+
+    .topics-panel .message-list::-webkit-scrollbar-track {
+        background: rgba(17, 26, 46, 0.9);
+    }
+
+    .topics-panel .message-list::-webkit-scrollbar-thumb {
+        border-color: rgba(17, 26, 46, 0.9);
+    }
 }
 
 @media (max-width: 1024px) {
@@ -141,9 +283,17 @@ header {
         grid-template-columns: 1fr;
     }
 
+    .dashboard-sidebar {
+        gap: 16px;
+    }
+
     .map-shell,
     .leaflet-map {
         min-height: 420px;
         height: 420px;
+    }
+
+    .speed-dial {
+        width: min(100%, 180px);
     }
 }

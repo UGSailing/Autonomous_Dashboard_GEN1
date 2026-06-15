@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import mqtt from 'mqtt'
 import Map from './Map'
+import Topics from './Topics'
+import SpeedCard from './SpeedCard'
 import './App.css'
 
-type MqttMessage = {
+export type MqttMessage = {
   topic: string
   payload: string
 }
@@ -19,13 +21,21 @@ type GnssFix = {
     }
     AccuracyHorizontal?: number
   }
+  Velocity?: {
+    North?: number
+    East?: number
+    Down?: number
+  }
   SatsInView?: number
   SatsInUse?: number
 }
 
+const topicsToDisplay = ['sense-3C6D66019257/gnss/Left/pvt']
+
 function App() {
   const [messages, setMessages] = useState<MqttMessage[]>([])
   const [gnssFix, setGnssFix] = useState<GnssFix | null>(null)
+  const forwardSpeed = calculateForwardSpeed(gnssFix?.Velocity?.North, gnssFix?.Velocity?.East)
 
   useEffect(() => {
     const client = mqtt.connect('ws://localhost:9001')
@@ -97,21 +107,17 @@ function App() {
           </div>
         </section>
 
-        <section className="panel">
-          <div className="panel-heading">
-            <h2>Topics</h2>
-            <p>Showing the latest {messages.length} messages</p>
-          </div>
-          {messages.length === 0 && <div className="empty-state">No messages yet</div>}
-          <ul className="message-list">
-            {messages.map((m, i) => (
-              <li key={i} className="message-card">
-                <div className="message-topic">{m.topic}</div>
-                <pre className="message-payload">{tryDecode(m.payload)}</pre>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <div className="dashboard-sidebar">
+          <section className="panel panel-speed">
+            <div className="panel-heading">
+              <h2>Speed</h2>
+              <p>Derived from north/east velocity</p>
+            </div>
+            <SpeedCard speedMetersPerSecond={forwardSpeed} />
+          </section>
+
+          <Topics messages={messages} displayTopics={topicsToDisplay} />
+        </div>
       </main>
     </div>
   )
@@ -122,17 +128,9 @@ function formatCoordinate(value?: number) {
   return value.toFixed(6)
 }
 
-function tryDecode(payload: string) {
-  // payload might be base64 for binary; try utf8 then base64->utf8
-  try {
-    // if looks like base64 (contains non-printable), show as base64 shortened
-    const buf = atob(payload)
-    // if decoded contains many nulls or non-printable, return base64
-    if (/\p{C}/u.test(buf)) return payload
-    return buf
-  } catch (e) {
-    return payload
-  }
+function calculateForwardSpeed(north?: number, east?: number) {
+  if (typeof north !== 'number' || typeof east !== 'number') return null
+  return Math.hypot(north, east)
 }
 
 export default App
