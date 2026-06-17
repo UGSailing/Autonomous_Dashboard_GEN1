@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import mqtt from 'mqtt'
 import Map from './Map'
+import Camera from './Camera'
 import Topics from './Topics'
 import SpeedCard from './SpeedCard'
 import './App.css'
@@ -108,16 +109,18 @@ function App() {
         </section>
 
         <div className="dashboard-sidebar">
-          <section className="panel panel-speed">
-            <div className="panel-heading">
-              <h2>Speed</h2>
-              <p>Derived from north/east velocity</p>
-            </div>
-            <SpeedCard speedMetersPerSecond={forwardSpeed} />
-          </section>
-
-          <Topics messages={messages} displayTopics={topicsToDisplay} />
+          <Camera />
         </div>
+        <section className="panel panel-speed">
+          <div className="panel-heading">
+            <h2>Speed</h2>
+            <p>Derived from north/east velocity</p>
+          </div>
+          <SpeedCard speedMetersPerSecond={forwardSpeed} />
+        </section>
+        <Topics messages={messages} displayTopics={topicsToDisplay} />
+
+
       </main>
     </div>
   )
