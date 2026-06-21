@@ -61,6 +61,10 @@ header {
     padding-bottom: 18px;
 }
 
+.panel-chart {
+    padding-bottom: 18px;
+}
+
 .camera-controls {
     display: inline-flex;
     gap: 8px;
@@ -245,6 +249,87 @@ header {
     color: rgba(248, 251, 255, 0.78);
 }
 
+.rpm-chart {
+    padding: 0 18px 18px;
+    display: grid;
+    gap: 14px;
+}
+
+.rpm-chart__svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.14), transparent 30%),
+        linear-gradient(180deg, rgba(13, 19, 34, 0.98), rgba(9, 14, 26, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 18px 36px rgba(15, 23, 42, 0.12);
+}
+
+.rpm-chart__axis {
+    stroke: rgba(255, 255, 255, 0.12);
+    stroke-width: 1;
+}
+
+.rpm-chart__area {
+    fill: url(#rpm-chart-fill);
+}
+
+.rpm-chart__line {
+    fill: none;
+    stroke: url(#rpm-chart-line);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.rpm-chart__point {
+    fill: #f8fbff;
+    stroke: rgba(15, 118, 110, 0.72);
+    stroke-width: 2;
+}
+
+.rpm-chart__footer {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.rpm-chart__footer>div {
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.38);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.rpm-chart__label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-h);
+}
+
+.rpm-chart__footer strong {
+    font-size: 18px;
+    color: var(--text-h);
+}
+
+.rpm-chart__empty {
+    margin: 0 18px 18px;
+    padding: 18px;
+    border-radius: 16px;
+    border: 1px dashed var(--border);
+    background: rgba(255, 255, 255, 0.26);
+    color: var(--text-h);
+    text-align: center;
+}
+
 .empty-state {
     padding: 0 18px 12px;
     color: var(--text);
@@ -394,5 +479,9 @@ header {
 
     .camera-control {
         padding-inline: 8px;
+    }
+
+    .rpm-chart__footer {
+        grid-template-columns: 1fr;
     }
 }

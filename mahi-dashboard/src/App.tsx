@@ -5,6 +5,7 @@ import Camera from './Camera'
 import Topics from './Topics'
 import SpeedCard from './SpeedCard'
 import RPMCard from './RPMCard'
+import RPMHistoryChart from './RPMHistoryChart'
 import './App.css'
 
 export type MqttMessage = {
@@ -47,6 +48,11 @@ type AngleFrame = {
   angle: number | null
 }
 
+type RpmSample = {
+  time: number
+  rpm: number
+}
+
 const ECU_HEARTBEAT_CAN_ID = 0x11
 const SET_ANGLE_CAN_ID = 0x204
 
@@ -59,6 +65,7 @@ function App() {
   const [angle, setAngle] = useState<number | null>(null)
   const [temperature, setTemperature] = useState<number | null>(null)
   const [humidity, setHumidity] = useState<number | null>(null)
+  const [rpmHistory, setRpmHistory] = useState<RpmSample[]>([])
   const forwardSpeed = calculateForwardSpeed(gnssFix?.Velocity?.North, gnssFix?.Velocity?.East)
 
   useEffect(() => {
@@ -100,6 +107,7 @@ function App() {
 
           if (heartbeat.rpm !== null) {
             setRpm(heartbeat.rpm)
+            setRpmHistory((samples) => [...samples, { time: Date.now(), rpm: heartbeat.rpm }].slice(-120))
           }
         } catch {
           // Keep the previous valid heartbeat values if the payload is malformed.
@@ -174,6 +182,14 @@ function App() {
             </p>
           </div>
           <RPMCard rpm={rpm} />
+        </section>
+
+        <section className="panel panel-speed panel-chart">
+          <div className="panel-heading">
+            <h2>RPM History</h2>
+            <p>Logged from the latest heartbeat samples</p>
+          </div>
+          <RPMHistoryChart samples={rpmHistory} />
         </section>
 
         <section className="panel panel-speed">
