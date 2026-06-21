@@ -5,7 +5,7 @@ type RPMCardProps = {
 const MAX_DISPLAY_RPM_MPS = 4500
 
 export default function RPMCard({ rpm }: RPMCardProps) {
-    const speed = typeof rpm === 'number' ? rpm : 0
+    const speed = typeof rpm === 'number' ? -rpm : 0
     const percent = Math.min(100, (speed / MAX_DISPLAY_RPM_MPS) * 100)
 
     return (
