@@ -33,6 +33,8 @@ export default function Map({ fix }: MapProps) {
     const mapRef = useRef<L.Map | null>(null)
     const markerRef = useRef<L.Marker | null>(null)
     const accuracyRef = useRef<L.CircleMarker | null>(null)
+    const pathRef = useRef<L.Polyline | null>(null)
+    const pathPointsRef = useRef<L.LatLngExpression[]>([])
     const hasCenteredRef = useRef(false)
 
     const latitude = fix?.Position?.LatLon?.Latitude
@@ -61,6 +63,8 @@ export default function Map({ fix }: MapProps) {
             mapRef.current = null
             markerRef.current = null
             accuracyRef.current = null
+            pathRef.current = null
+            pathPointsRef.current = []
             hasCenteredRef.current = false
         }
     }, [])
@@ -70,6 +74,27 @@ export default function Map({ fix }: MapProps) {
         if (!map) return
 
         if (hasPosition) {
+            const nextPoint: [number, number] = [latitude, longitude]
+            const lastPoint = pathPointsRef.current[pathPointsRef.current.length - 1]
+            const lastLatitude = Array.isArray(lastPoint) ? lastPoint[0] : undefined
+            const lastLongitude = Array.isArray(lastPoint) ? lastPoint[1] : undefined
+
+            if (lastLatitude !== latitude || lastLongitude !== longitude) {
+                pathPointsRef.current = [...pathPointsRef.current, nextPoint]
+
+                if (!pathRef.current) {
+                    pathRef.current = L.polyline(pathPointsRef.current, {
+                        color: '#0f766e',
+                        weight: 4,
+                        opacity: 0.85,
+                        lineCap: 'round',
+                        lineJoin: 'round',
+                    }).addTo(map)
+                } else {
+                    pathRef.current.setLatLngs(pathPointsRef.current)
+                }
+            }
+
             if (!hasCenteredRef.current) {
                 map.setView(center, map.getZoom(), { animate: true })
                 hasCenteredRef.current = true
