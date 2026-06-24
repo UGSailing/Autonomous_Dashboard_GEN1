@@ -1,0 +1,129 @@
+/* ── BatteryCard ──────────────────────────────────────────── */
+.battery-card {
+    --bat-green: #22c55e;
+    --bat-amber: #f59e0b;
+    --bat-red: #ef4444;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: 100%;
+}
+
+.battery-card--error {
+    outline: 2px solid var(--bat-red);
+    outline-offset: 4px;
+    border-radius: 6px;
+}
+
+/* Status pills */
+.battery-status-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.battery-pill {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    line-height: 1.4;
+}
+
+.battery-pill--online {
+    background: rgba(34, 197, 94, 0.18);
+    color: #22c55e;
+}
+
+.battery-pill--offline {
+    background: rgba(156, 163, 175, 0.18);
+    color: #9ca3af;
+}
+
+.battery-pill--error {
+    background: rgba(239, 68, 68, 0.18);
+    color: #ef4444;
+}
+
+/* Visual battery shape */
+.battery-visual {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.battery-body {
+    position: relative;
+    flex: 1;
+    height: 2.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.battery-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    height: 100%;
+    transition: width 0.5s ease, background 0.5s ease;
+    border-radius: 4px 0 0 4px;
+}
+
+.battery-pct {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+}
+
+.battery-nub {
+    width: 5px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 0 3px 3px 0;
+    flex-shrink: 0;
+}
+
+/* Metrics */
+.battery-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.battery-metric {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 0.4rem 0.5rem;
+}
+
+.battery-metric dt {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 0.15rem;
+}
+
+.battery-metric dd {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+}
+
+.bat-charging {
+    color: #22c55e;
+}
