@@ -1,15 +1,15 @@
 # MAHI Dashboard
 
 ## Frontend
-
-## Backend
-In mahidashboard
+React app in mahi-dashboard
 
 npm i
 
 npm run dev
 
+## Backend
 Run the MAHI-manet
+sudo ./manet --fullconf manet.conf
 
 Make sure you add
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import mqtt from 'mqtt'
-import Map, { type Detection, type BuoyHistory, type Waypoint } from './Map'
+import Map, { type Detection, type BuoyHistory, type Waypoint, type CrossLine } from './Map'
 import Camera from './Camera'
 import Topics from './Topics'
 import SpeedCard from './SpeedCard'
@@ -65,6 +65,7 @@ const DETECTIONS_TOPIC = 'detections/coordinates'
 const BUOY_POSITIONS_TOPIC = 'detections/buoy_positions'
 const PATH_TOPIC = 'navigation/path'
 const CURRENT_WAYPOINT_TOPIC = 'navigation/current'
+const CROSSLINE_TOPIC = 'navigation/crossline'
 
 const topicsToDisplay = ['sense-3C6D66019257/gnss/Left/pvt', 'can/ugent/tx']
 
@@ -166,6 +167,27 @@ function parseCurrentWaypoint(payload: string): Waypoint | null {
   }
 }
 
+// Parse the navigation/crossline topic.
+// Python publishes: [[lat1, lon1], [lat2, lon2]]
+function parseCrossLine(payload: string): CrossLine | null {
+  try {
+    const raw = JSON.parse(payload)
+    if (
+      Array.isArray(raw) &&
+      raw.length >= 2 &&
+      Array.isArray(raw[0]) && raw[0].length >= 2 &&
+      typeof raw[0][0] === 'number' && typeof raw[0][1] === 'number' &&
+      Array.isArray(raw[1]) && raw[1].length >= 2 &&
+      typeof raw[1][0] === 'number' && typeof raw[1][1] === 'number'
+    ) {
+      return [[raw[0][0], raw[0][1]], [raw[1][0], raw[1][1]]]
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 // ── BMS Battery parser (CAN ID 258 / 0x102) ───────────────────────────────────
 function parseBmsBattery(message: CanTxMessage): Partial<BatteryData> {
   if (message.can_id !== BMS_BATTERY_CAN_ID) return {}
@@ -219,6 +241,7 @@ function App() {
   const [buoyHistories, setBuoyHistories] = useState<BuoyHistory[]>([])
   const [waypoints, setWaypoints] = useState<Waypoint[]>([])
   const [currentWaypoint, setCurrentWaypoint] = useState<Waypoint | null>(null)
+  const [crossLine, setCrossLine] = useState<CrossLine | null>(null)
   const [rpm, setRpm] = useState<number | null>(null)
   const [angle, setAngle] = useState<number | null>(null)
   const [temperature, setTemperature] = useState<number | null>(null)
@@ -344,6 +367,14 @@ function App() {
         setCurrentWaypoint(parseCurrentWaypoint(payload))
       }
 
+      // ── Cross-line ────────────────────────────────────────────────────────
+      // Python publishes: [[lat1, lon1], [lat2, lon2]]
+      // The line is drawn through both points and extended beyond them so it
+      // reads as an infinite reference line on the map.
+      if (topic === CROSSLINE_TOPIC) {
+        setCrossLine(parseCrossLine(payload))
+      }
+
       // ── CAN bus ───────────────────────────────────────────────────────────
       if (topic === 'can/ugent/tx') {
         try {
@@ -397,6 +428,7 @@ function App() {
             buoyHistories={buoyHistories}
             waypoints={waypoints}
             currentWaypoint={currentWaypoint}
+            crossLine={crossLine}
           />
           <div className="fix-summary">
             {gnssFix?.FixIsValid ? (

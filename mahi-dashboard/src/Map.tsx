@@ -33,7 +33,14 @@ export type Waypoint = {
     speed: number
 }
 
+// A cross-line defined by exactly two [lat, lon] points.
+export type CrossLine = [[number, number], [number, number]]
+
 const defaultCenter: [number, number] = [51.0, 3.7]
+
+// How far (in degrees) to extend the cross-line beyond its two defining points
+// so it reads as an infinite reference line even after zooming.
+const CROSSLINE_EXTENSION_DEG = 0.05
 
 // ---------------------------------------------------------------------------
 // Icon factories
@@ -162,6 +169,28 @@ function makeDetectionDotIcon() {
 }
 
 // ---------------------------------------------------------------------------
+// Helper: extend a line segment beyond its two endpoints so it reads as
+// an infinite reference line on the map.
+// ---------------------------------------------------------------------------
+
+function extendCrossLine(
+    p1: [number, number],
+    p2: [number, number],
+    extDeg: number,
+): [[number, number], [number, number]] {
+    const dLat = p2[0] - p1[0]
+    const dLon = p2[1] - p1[1]
+    const len = Math.sqrt(dLat * dLat + dLon * dLon)
+    if (len === 0) return [p1, p2]
+    const uLat = dLat / len
+    const uLon = dLon / len
+    return [
+        [p1[0] - uLat * extDeg, p1[1] - uLon * extDeg],
+        [p2[0] + uLat * extDeg, p2[1] + uLon * extDeg],
+    ]
+}
+
+// ---------------------------------------------------------------------------
 // Internal bookkeeping type for a single buoy's map layers
 // ---------------------------------------------------------------------------
 
@@ -182,6 +211,7 @@ type MapProps = {
     buoyHistories?: BuoyHistory[]  // per-buoy full position history
     waypoints?: Waypoint[]         // planned path waypoints with speed
     currentWaypoint?: Waypoint | null  // active waypoint, highlighted in red
+    crossLine?: CrossLine | null   // two-point reference line from navigation/crossline
 }
 
 export default function Map({
@@ -191,6 +221,7 @@ export default function Map({
     buoyHistories = [],
     waypoints = [],
     currentWaypoint = null,
+    crossLine = null,
 }: MapProps) {
     const mapElementRef = useRef<HTMLDivElement | null>(null)
     const mapRef = useRef<L.Map | null>(null)
@@ -214,6 +245,9 @@ export default function Map({
 
     // Current waypoint marker.
     const currentWaypointMarkerRef = useRef<L.Marker | null>(null)
+
+    // Cross-line polyline.
+    const crossLineRef = useRef<L.Polyline | null>(null)
 
     const latitude = fix?.Position?.LatLon?.Latitude
     const longitude = fix?.Position?.LatLon?.Longitude
@@ -260,6 +294,7 @@ export default function Map({
             waypointMarkersRef.current = []
             plannedPathRef.current = null
             currentWaypointMarkerRef.current = null
+            crossLineRef.current = null
         }
     }, [])
 
@@ -407,6 +442,43 @@ export default function Map({
             )
             .addTo(map)
     }, [currentWaypoint])
+
+    // ---------------------------------------------------------------------------
+    // Cross-line: dashed cyan/blue polyline through two defining points,
+    // extended beyond them so it reads as an infinite reference line.
+    // ---------------------------------------------------------------------------
+    useEffect(() => {
+        const map = mapRef.current
+        if (!map) return
+
+        if (crossLineRef.current) {
+            crossLineRef.current.remove()
+            crossLineRef.current = null
+        }
+
+        if (!crossLine) return
+
+        const [extended1, extended2] = extendCrossLine(
+            crossLine[0],
+            crossLine[1],
+            CROSSLINE_EXTENSION_DEG,
+        )
+
+        crossLineRef.current = L.polyline([extended1, extended2], {
+            color: '#06b6d4',   // cyan-500 — visually distinct from teal boat trail and purple waypoints
+            weight: 2,
+            opacity: 0.85,
+            dashArray: '10 6',
+            lineCap: 'round',
+        })
+            .bindTooltip(
+                `Cross-line<br />`
+                + `P1: ${crossLine[0][0].toFixed(6)}, ${crossLine[0][1].toFixed(6)}<br />`
+                + `P2: ${crossLine[1][0].toFixed(6)}, ${crossLine[1][1].toFixed(6)}`,
+                { sticky: true }
+            )
+            .addTo(map)
+    }, [crossLine])
 
     // ---------------------------------------------------------------------------
     // Buoy histories: seed marker (amber) + detection dots + trail polyline
