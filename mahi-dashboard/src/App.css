@@ -1,15 +1,33 @@
 .App {
     padding: 32px;
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
-header {
-    margin-bottom: 24px;
-    text-align: left;
+.app-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.app-logo {
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.app-header__text {
+    min-width: 0;
 }
 
 .subhead {
     max-width: 760px;
     margin-top: 8px;
+    color: var(--text-muted);
 }
 
 .dashboard-grid {
@@ -22,11 +40,73 @@ header {
 .dashboard-main-column {
     display: grid;
     gap: 20px;
+    min-width: 0;
 }
 
 .dashboard-sidebar {
     display: grid;
     gap: 20px;
+    grid-row: 1 / -1;
+    position: sticky;
+    top: 24px;
+}
+
+.dashboard-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.panel-span-full {
+    grid-column: 1 / -1;
+}
+
+.panel-body {
+    padding: 0 18px 18px;
+}
+
+.panel-metric .panel-body {
+    margin: 0 18px 18px;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+
+.panel-dials {
+    padding-bottom: 18px;
+}
+
+.dials-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 0 18px 18px;
+}
+
+.dial-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 12px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+}
+
+.dial-block__label {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+}
+
+.dial-block__hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
 }
 
 .panel-camera {
@@ -37,10 +117,8 @@ header {
     text-align: left;
     border: 1px solid var(--border);
     border-radius: 18px;
-    background: linear-gradient(180deg, var(--surface), var(--surface-2));
-    box-shadow: var(--shadow);
+    background: var(--surface);
     overflow: hidden;
-    backdrop-filter: blur(14px);
 }
 
 .panel-heading {
@@ -53,14 +131,8 @@ header {
     font-size: 14px;
 }
 
-.panel-map {
-    padding-bottom: 18px;
-}
-
-.panel-speed {
-    padding-bottom: 18px;
-}
-
+.panel-map,
+.panel-speed,
 .panel-chart {
     padding-bottom: 18px;
 }
@@ -72,8 +144,7 @@ header {
     padding: 6px;
     border-radius: 999px;
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.42);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    background: var(--surface-2);
 }
 
 .camera-control {
@@ -86,17 +157,15 @@ header {
     font: inherit;
     font-weight: 700;
     cursor: pointer;
-    transition: background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
 }
 
 .camera-control:hover {
-    background: rgba(17, 94, 89, 0.08);
+    background: var(--accent-bg);
 }
 
 .camera-control.is-active {
     background: var(--accent);
-    color: white;
-    box-shadow: 0 8px 20px rgba(15, 118, 110, 0.24);
+    color: #ffffff;
 }
 
 .camera-grid {
@@ -123,8 +192,18 @@ header {
     display: block;
     border-radius: 16px;
     border: 1px solid var(--border);
-    background: #111827;
-    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.32);
+    background: var(--surface-2);
+}
+
+.camera-frame__placeholder {
+    display: grid;
+    place-items: center;
+    object-fit: unset;
+    background: var(--accent-bg);
+    border: 1px dashed var(--accent);
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .camera-frame__caption {
@@ -153,10 +232,9 @@ header {
     inset: 0;
     display: grid;
     place-items: center;
-    background: rgba(7, 11, 20, 0.44);
-    color: white;
+    background: var(--accent-bg);
+    color: var(--accent);
     font-weight: 600;
-    letter-spacing: 0.3px;
     pointer-events: none;
 }
 
@@ -169,16 +247,15 @@ header {
     position: absolute;
     inset: 5px;
     border-radius: 999px;
-    background: #115e59;
-    border: 3px solid white;
-    box-shadow: 0 0 0 8px rgba(17, 94, 89, 0.18);
+    background: var(--accent);
+    border: 3px solid #ffffff;
 }
 
 .boat-marker-ring {
     position: absolute;
     inset: 0;
     border-radius: 999px;
-    border: 1px solid rgba(17, 94, 89, 0.4);
+    border: 1px solid var(--accent);
 }
 
 .fix-summary {
@@ -192,31 +269,19 @@ header {
 .speed-dial {
     --speed-progress: 0%;
 
-    width: min(100%, 220px);
+    width: min(100%, 200px);
     aspect-ratio: 1 / 1;
-    margin: 16px auto 18px;
+    margin: 0 auto;
 }
 
 .speed-dial__ring {
     width: 100%;
     height: 100%;
     border-radius: 999px;
-    background:
-        conic-gradient(var(--accent) 0 var(--speed-progress), rgba(255, 255, 255, 0.16) var(--speed-progress) 100%);
+    background: conic-gradient(var(--accent) 0 var(--speed-progress), #eeeeee var(--speed-progress) 100%);
     padding: 12px;
     box-sizing: border-box;
     position: relative;
-    box-shadow:
-        0 18px 36px rgba(15, 23, 42, 0.14),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
-.speed-dial__ring::after {
-    content: '';
-    position: absolute;
-    inset: 12px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .speed-dial__ring-inner {
@@ -227,18 +292,16 @@ header {
     border-radius: 999px;
     display: grid;
     place-items: center;
-    background:
-        radial-gradient(circle at 30% 20%, rgba(94, 234, 212, 0.16), transparent 34%),
-        linear-gradient(180deg, rgba(12, 18, 32, 0.98), rgba(9, 14, 26, 0.98));
+    background: var(--surface);
+    border: 1px solid var(--border);
     text-align: center;
 }
 
 .speed-dial__value {
     font-size: clamp(2.4rem, 9vw, 3.4rem);
     line-height: 1;
-    color: #f8fbff;
+    color: var(--accent);
     letter-spacing: -0.04em;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.34);
 }
 
 .speed-dial__unit {
@@ -246,7 +309,7 @@ header {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    color: rgba(248, 251, 255, 0.78);
+    color: var(--text-muted);
 }
 
 .rpm-chart {
@@ -260,35 +323,30 @@ header {
     height: auto;
     display: block;
     border-radius: 16px;
-    background:
-        radial-gradient(circle at top left, rgba(15, 118, 110, 0.14), transparent 30%),
-        linear-gradient(180deg, rgba(13, 19, 34, 0.98), rgba(9, 14, 26, 0.98));
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.06),
-        0 18px 36px rgba(15, 23, 42, 0.12);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
 }
 
 .rpm-chart__axis {
-    stroke: rgba(255, 255, 255, 0.12);
+    stroke: #dddddd;
     stroke-width: 1;
 }
 
 .rpm-chart__area {
-    fill: url(#rpm-chart-fill);
+    fill: var(--accent-bg);
 }
 
 .rpm-chart__line {
     fill: none;
-    stroke: url(#rpm-chart-line);
-    stroke-width: 3.5;
+    stroke: var(--accent);
+    stroke-width: 3;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
 .rpm-chart__point {
-    fill: #f8fbff;
-    stroke: rgba(15, 118, 110, 0.72);
+    fill: var(--accent);
+    stroke: #ffffff;
     stroke-width: 2;
 }
 
@@ -302,8 +360,7 @@ header {
     padding: 12px;
     border-radius: 14px;
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.38);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    background: var(--surface-2);
 }
 
 .rpm-chart__label {
@@ -312,21 +369,21 @@ header {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--text-h);
+    color: var(--text-muted);
 }
 
 .rpm-chart__footer strong {
     font-size: 18px;
-    color: var(--text-h);
+    color: var(--accent);
 }
 
 .rpm-chart__empty {
     margin: 0 18px 18px;
     padding: 18px;
     border-radius: 16px;
-    border: 1px dashed var(--border);
-    background: rgba(255, 255, 255, 0.26);
-    color: var(--text-h);
+    border: 1px dashed var(--accent);
+    background: var(--accent-bg);
+    color: var(--accent);
     text-align: center;
 }
 
@@ -349,15 +406,12 @@ header {
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 12px;
-    background:
-        radial-gradient(circle at top right, rgba(15, 118, 110, 0.08), transparent 32%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(243, 247, 253, 0.96));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    background: var(--surface-2);
 }
 
 .message-topic {
     font-size: 13px;
-    color: var(--text-h);
+    color: var(--accent);
     font-weight: 700;
     margin-bottom: 10px;
     word-break: break-word;
@@ -377,78 +431,40 @@ header {
     line-height: 1.5;
 }
 
-.topics-panel .panel-heading p,
-.topics-panel .empty-state {
-    color: var(--text-h);
-}
-
-.topics-panel .message-list {
-    scrollbar-color: var(--accent) var(--surface-2);
-}
-
-.topics-panel .message-list::-webkit-scrollbar {
-    width: 10px;
-}
-
-.topics-panel .message-list::-webkit-scrollbar-track {
-    background: var(--surface-2);
-    border-radius: 999px;
-}
-
-.topics-panel .message-list::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--accent), rgba(15, 118, 110, 0.72));
-    border-radius: 999px;
-    border: 2px solid var(--surface-2);
-}
-
-@media (prefers-color-scheme: dark) {
-    .message-card {
-        background:
-            radial-gradient(circle at top right, rgba(94, 234, 212, 0.08), transparent 32%),
-            linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 26, 46, 0.96));
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    }
-
-    .message-topic {
-        color: #f8fbff;
-    }
-
-    .message-payload {
-        background: rgba(9, 17, 31, 0.92);
-        border-color: #32445f;
-        color: #f8fbff;
-    }
-
-    .topics-panel .panel-heading p,
-    .topics-panel .empty-state {
-        color: #d5deeb;
-    }
-
-    .topics-panel .message-list {
-        scrollbar-color: var(--accent) rgba(17, 26, 46, 0.9);
-    }
-
-    .topics-panel .message-list::-webkit-scrollbar-track {
-        background: rgba(17, 26, 46, 0.9);
-    }
-
-    .topics-panel .message-list::-webkit-scrollbar-thumb {
-        border-color: rgba(17, 26, 46, 0.9);
-    }
-}
-
 @media (max-width: 1024px) {
     .App {
         padding: 20px;
+    }
+
+    .app-header {
+        gap: 16px;
+    }
+
+    .app-logo {
+        width: 64px;
+        height: 64px;
     }
 
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
 
+    .dashboard-sidebar {
+        grid-row: auto;
+        position: static;
+    }
+
     .dashboard-main-column,
     .dashboard-sidebar {
         gap: 16px;
+    }
+
+    .dashboard-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dials-row {
+        grid-template-columns: 1fr 1fr;
     }
 
     .map-shell,
@@ -468,10 +484,13 @@ header {
         flex-wrap: wrap;
         border-radius: 18px;
     }
-
 }
 
 @media (max-width: 640px) {
+    .dials-row {
+        grid-template-columns: 1fr;
+    }
+
     .camera-controls {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));

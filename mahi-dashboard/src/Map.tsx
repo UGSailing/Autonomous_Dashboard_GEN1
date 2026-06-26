@@ -54,7 +54,7 @@ function makeBoatIcon(headingDeg: number) {
             height: 0;
             border-left: 8px solid transparent;
             border-right: 8px solid transparent;
-            border-bottom: 22px solid #0f766e;
+            border-bottom: 22px solid #ff0000;
             transform: rotate(${headingDeg}deg);
             transform-origin: 50% 65%;
             filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
@@ -316,7 +316,7 @@ export default function Map({
 
                 if (!pathRef.current) {
                     pathRef.current = L.polyline(pathPointsRef.current, {
-                        color: '#0f766e',
+                        color: '#ff0000',
                         weight: 4,
                         opacity: 0.85,
                         lineCap: 'round',
@@ -354,8 +354,8 @@ export default function Map({
                 if (!accuracyRef.current) {
                     accuracyRef.current = L.circleMarker(center, {
                         radius,
-                        color: '#115e59',
-                        fillColor: '#115e59',
+                        color: '#ff0000',
+                        fillColor: '#ff0000',
                         fillOpacity: 0.12,
                         weight: 2,
                     }).addTo(map)

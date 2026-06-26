@@ -9,7 +9,7 @@ export default function Topics({ messages, displayTopics }: TopicsProps) {
     const filteredMessages = messages.filter((message) => displayTopics.includes(message.topic)).slice(0, 20)
 
     return (
-        <section className="panel topics-panel">
+        <section className="panel topics-panel panel-span-full">
             <div className="panel-heading">
                 <h2>Topics</h2>
                 <p>Showing the latest {filteredMessages.length} matching messages</p>

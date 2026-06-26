@@ -39,17 +39,6 @@ export default function RPMHistoryChart({ samples }: RPMHistoryChartProps) {
     return (
         <div className="rpm-chart">
             <svg className="rpm-chart__svg" viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`} role="img" aria-label="RPM history chart">
-                <defs>
-                    <linearGradient id="rpm-chart-line" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.95" />
-                        <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.1" />
-                    </linearGradient>
-                    <linearGradient id="rpm-chart-fill" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="rgba(15, 118, 110, 0.36)" />
-                        <stop offset="100%" stopColor="rgba(15, 118, 110, 0.03)" />
-                    </linearGradient>
-                </defs>
-
                 <line x1={CHART_PADDING} y1={CHART_HEIGHT - CHART_PADDING} x2={CHART_WIDTH - CHART_PADDING} y2={CHART_HEIGHT - CHART_PADDING} className="rpm-chart__axis" />
                 <line x1={CHART_PADDING} y1={CHART_PADDING} x2={CHART_PADDING} y2={CHART_HEIGHT - CHART_PADDING} className="rpm-chart__axis" />
 

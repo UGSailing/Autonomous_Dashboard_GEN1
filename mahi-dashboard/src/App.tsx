@@ -410,96 +410,110 @@ function App() {
 
   return (
     <div className="App">
-      <header>
-        <h1>MQTT Dashboard</h1>
-        <p className="subhead">Live GNSS position for the boat and a running MQTT message log.</p>
+      <header className="app-header">
+        <img className="app-logo" src="/logo.png" alt="UGent Sailing" />
+        <div className="app-header__text">
+          <h1>EMMA Dashboard</h1>
+          <p className="subhead">Live Autonomous Data from UGent Sailing</p>
+        </div>
       </header>
 
       <main className="dashboard-grid">
-        <section className="panel panel-map">
-          <div className="panel-heading">
-            <h2>Map</h2>
-            <p>Topic: sense-3C6D66019257/gnss/Left/pvt</p>
+        <div className="dashboard-main-column">
+          <section className="panel panel-map">
+            <div className="panel-heading">
+              <h2>Map</h2>
+              <p>Topic: sense-3C6D66019257/gnss/Left/pvt</p>
+            </div>
+            <Map
+              fix={gnssFix}
+              headingDeg={headingDeg}
+              detections={detections}
+              buoyHistories={buoyHistories}
+              waypoints={waypoints}
+              currentWaypoint={currentWaypoint}
+              crossLine={crossLine}
+            />
+            <div className="fix-summary">
+              {gnssFix?.FixIsValid ? (
+                <>
+                  <strong>Fix valid</strong>
+                  <span>
+                    {formatCoordinate(gnssFix?.Position?.LatLon?.Latitude)} ,{' '}
+                    {formatCoordinate(gnssFix?.Position?.LatLon?.Longitude)}
+                  </span>
+                  <span>
+                    {gnssFix?.SatsInUse ?? 0} in use, {gnssFix?.SatsInView ?? 0} in view
+                  </span>
+                  {headingDeg !== null && <span>HDG {headingDeg.toFixed(1)}°</span>}
+                </>
+              ) : (
+                <span>Waiting for a valid GNSS fix.</span>
+              )}
+            </div>
+          </section>
+
+          <section className="panel panel-dials">
+            <div className="panel-heading">
+              <h2>Speed &amp; RPM</h2>
+              <p>
+                {angle === null ? 'Set angle: N/A' : `Set angle: ${angle.toFixed(0)}°`}
+                {' · '}
+                {temperature === null ? 'Temp: N/A' : `Temp: ${temperature.toFixed(0)}°C`}
+                {' · '}
+                {humidity === null ? 'Humidity: N/A' : `Humidity: ${humidity.toFixed(0)}%`}
+              </p>
+            </div>
+            <div className="dials-row">
+              <div className="dial-block">
+                <span className="dial-block__label">Speed</span>
+                <SpeedCard speedMetersPerSecond={forwardSpeed} />
+                <span className="dial-block__hint">Derived from north/east velocity</span>
+              </div>
+              <div className="dial-block">
+                <span className="dial-block__label">RPM</span>
+                <RPMCard rpm={rpm} />
+                <span className="dial-block__hint">ECU heartbeat</span>
+              </div>
+            </div>
+          </section>
+
+          <div className="dashboard-metrics-grid">
+            <section className="panel panel-chart panel-span-full">
+              <div className="panel-heading">
+                <h2>RPM History</h2>
+                <p>Logged from the latest heartbeat samples</p>
+              </div>
+              <RPMHistoryChart samples={rpmHistory} />
+            </section>
+
+            <section className="panel panel-metric">
+              <div className="panel-heading">
+                <h2>Battery</h2>
+                <p>BMS — CAN ID 0x102</p>
+              </div>
+              <div className="panel-body">
+                <BatteryCard data={batteryData} />
+              </div>
+            </section>
+
+            <section className="panel panel-metric">
+              <div className="panel-heading">
+                <h2>Drive Mode</h2>
+                <p>ECU Info — CAN ID 0x121</p>
+              </div>
+              <div className="panel-body">
+                <AutonomousIndicator data={ecuData} />
+              </div>
+            </section>
+
+            <Topics messages={messages} displayTopics={topicsToDisplay} />
           </div>
-          <Map
-            fix={gnssFix}
-            headingDeg={headingDeg}
-            detections={detections}
-            buoyHistories={buoyHistories}
-            waypoints={waypoints}
-            currentWaypoint={currentWaypoint}
-            crossLine={crossLine}
-          />
-          <div className="fix-summary">
-            {gnssFix?.FixIsValid ? (
-              <>
-                <strong>Fix valid</strong>
-                <span>
-                  {formatCoordinate(gnssFix?.Position?.LatLon?.Latitude)} ,{' '}
-                  {formatCoordinate(gnssFix?.Position?.LatLon?.Longitude)}
-                </span>
-                <span>
-                  {gnssFix?.SatsInUse ?? 0} in use, {gnssFix?.SatsInView ?? 0} in view
-                </span>
-                {headingDeg !== null && <span>HDG {headingDeg.toFixed(1)}°</span>}
-              </>
-            ) : (
-              <span>Waiting for a valid GNSS fix.</span>
-            )}
-          </div>
-        </section>
+        </div>
 
         <div className="dashboard-sidebar">
           <Camera leftSrc={leftFrameUrl} rightSrc={rightFrameUrl} />
         </div>
-
-        <section className="panel panel-speed">
-          <div className="panel-heading">
-            <h2>RPM</h2>
-            <p>
-              {angle === null ? 'Set angle: N/A' : `Set angle: ${angle.toFixed(0)}°`}
-              {' · '}
-              {temperature === null ? 'Temp: N/A' : `Temp: ${temperature.toFixed(0)}°C`}
-              {' · '}
-              {humidity === null ? 'Humidity: N/A' : `Humidity: ${humidity.toFixed(0)}%`}
-            </p>
-          </div>
-          <RPMCard rpm={rpm} />
-        </section>
-
-        <section className="panel panel-speed panel-chart">
-          <div className="panel-heading">
-            <h2>RPM History</h2>
-            <p>Logged from the latest heartbeat samples</p>
-          </div>
-          <RPMHistoryChart samples={rpmHistory} />
-        </section>
-
-        <section className="panel panel-speed">
-          <div className="panel-heading">
-            <h2>Speed</h2>
-            <p>Derived from north/east velocity</p>
-          </div>
-          <SpeedCard speedMetersPerSecond={forwardSpeed} />
-        </section>
-
-        <section className="panel panel-speed">
-          <div className="panel-heading">
-            <h2>Battery</h2>
-            <p>BMS — CAN ID 0x102</p>
-          </div>
-          <BatteryCard data={batteryData} />
-        </section>
-
-        <section className="panel panel-speed">
-          <div className="panel-heading">
-            <h2>Drive Mode</h2>
-            <p>ECU Info — CAN ID 0x121</p>
-          </div>
-          <AutonomousIndicator data={ecuData} />
-        </section>
-
-        <Topics messages={messages} displayTopics={topicsToDisplay} />
       </main>
     </div>
   )
