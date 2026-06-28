@@ -1,7 +1,8 @@
 services:
-  site:
-    build: .
-    container_name: emma
+  mahi-dashboard:
+    build:
+      context: ./mahi-dashboard
+    container_name: mahi-dashboard
     restart: always
     healthcheck:
       test: curl --fail -s http://localhost:3000
@@ -19,20 +20,6 @@ services:
       - traefik.http.routers.emma.entrypoints=https
       - traefik.http.routers.emma.tls=true
       - traefik.http.routers.emma.tls.certresolver=letsencrypt
-    networks:
-      - traefik_proxy
-
-  mahi-dashboard:
-    build:
-      context: ./mahi-dashboard
-    container_name: mahi-dashboard
-    restart: always
-    healthcheck:
-      test: curl --fail -s http://localhost:3000
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 120s
     networks:
       - traefik_proxy
 
