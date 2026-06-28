@@ -93,7 +93,7 @@
 
 .battery-metrics {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.5rem;
     margin: 0;
 }
@@ -103,6 +103,7 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 0.4rem 0.5rem;
+    min-width: 0;
 }
 
 .battery-metric dt {
@@ -119,6 +120,14 @@
     font-weight: 600;
     color: var(--text-h);
     margin: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+@container (max-width: 420px) {
+    .battery-metrics {
+        grid-template-columns: 1fr;
+    }
 }
 
 .bat-charging {
