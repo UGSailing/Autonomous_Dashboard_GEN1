@@ -257,57 +257,17 @@ function App() {
     gnssFix?.Velocity?.East,
   )
 
-  const pendingFrames = useRef<{ left: Uint8Array | null; right: Uint8Array | null }>({
-    left: null,
-    right: null,
-  })
+  // Track current object URLs so we can revoke them when replaced
   const currentObjectUrls = useRef<{ left: string | null; right: string | null }>({
     left: null,
     right: null,
   })
 
-  // RAF loop for video frames
-  useEffect(() => {
-    let rafId: number
-
-    const renderLoop = () => {
-      const pending = pendingFrames.current
-
-      if (pending.left) {
-        const bytes = pending.left
-        pending.left = null
-        const url = URL.createObjectURL(new Blob([bytes], { type: 'image/jpeg' }))
-        const previous = currentObjectUrls.current.left
-        currentObjectUrls.current.left = url
-        setLeftFrameUrl(url)
-        if (previous) URL.revokeObjectURL(previous)
-      }
-
-      if (pending.right) {
-        const bytes = pending.right
-        pending.right = null
-        const url = URL.createObjectURL(new Blob([bytes], { type: 'image/jpeg' }))
-        const previous = currentObjectUrls.current.right
-        currentObjectUrls.current.right = url
-        setRightFrameUrl(url)
-        if (previous) URL.revokeObjectURL(previous)
-      }
-
-      rafId = requestAnimationFrame(renderLoop)
-    }
-
-    rafId = requestAnimationFrame(renderLoop)
-
-    return () => {
-      cancelAnimationFrame(rafId)
-      if (currentObjectUrls.current.left) URL.revokeObjectURL(currentObjectUrls.current.left)
-      if (currentObjectUrls.current.right) URL.revokeObjectURL(currentObjectUrls.current.right)
-    }
-  }, [])
-
   // MQTT
   useEffect(() => {
-    const client = mqtt.connect('ws://localhost:9001')
+    const client = mqtt.connect('ws://localhost:9001', {
+      resubscribe: false,
+    })
 
     client.on('connect', () => {
       console.log('[MQTT] connected')
@@ -315,13 +275,25 @@ function App() {
     })
 
     client.on('message', (topic, message) => {
-      // ── Binary video frames (handled before toString()) ──────────────────
+      // ── Binary video frames — render immediately, no buffering ────────────
+      // Frames are converted to object URLs and displayed as soon as they
+      // arrive. The previous URL is revoked immediately to free memory.
+      // No RAF loop or pendingFrames ref — that introduced a per-tick delay
+      // that caused the 5-second lag when frames arrived faster than 60 fps.
       if (topic === LEFT_VIDEO_TOPIC) {
-        pendingFrames.current.left = new Uint8Array(message)
+        const url = URL.createObjectURL(new Blob([new Uint8Array(message)], { type: 'image/jpeg' }))
+        const previous = currentObjectUrls.current.left
+        currentObjectUrls.current.left = url
+        setLeftFrameUrl(url)
+        if (previous) URL.revokeObjectURL(previous)
         return
       }
       if (topic === RIGHT_VIDEO_TOPIC) {
-        pendingFrames.current.right = new Uint8Array(message)
+        const url = URL.createObjectURL(new Blob([new Uint8Array(message)], { type: 'image/jpeg' }))
+        const previous = currentObjectUrls.current.right
+        currentObjectUrls.current.right = url
+        setRightFrameUrl(url)
+        if (previous) URL.revokeObjectURL(previous)
         return
       }
 
@@ -360,17 +332,11 @@ function App() {
       }
 
       // ── Current (active) waypoint ─────────────────────────────────────────
-      // Published with retain=true by publish_point() whenever the controller
-      // advances to a new waypoint target.  Re-delivered on connect so the map
-      // shows the correct target immediately after a page refresh.
       if (topic === CURRENT_WAYPOINT_TOPIC) {
         setCurrentWaypoint(parseCurrentWaypoint(payload))
       }
 
       // ── Cross-line ────────────────────────────────────────────────────────
-      // Python publishes: [[lat1, lon1], [lat2, lon2]]
-      // The line is drawn through both points and extended beyond them so it
-      // reads as an infinite reference line on the map.
       if (topic === CROSSLINE_TOPIC) {
         setCrossLine(parseCrossLine(payload))
       }
@@ -405,7 +371,11 @@ function App() {
 
     client.on('error', (err) => console.error('[MQTT] error', err))
 
-    return () => { client.end() }
+    return () => {
+      client.end()
+      if (currentObjectUrls.current.left) URL.revokeObjectURL(currentObjectUrls.current.left)
+      if (currentObjectUrls.current.right) URL.revokeObjectURL(currentObjectUrls.current.right)
+    }
   }, [])
 
   return (
@@ -507,7 +477,7 @@ function App() {
               </div>
             </section>
 
-            <Topics messages={messages} displayTopics={topicsToDisplay} />
+            {/* <Topics messages={messages} displayTopics={topicsToDisplay} /> */}
           </div>
         </div>
 
