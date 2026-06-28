@@ -1,0 +1,53 @@
+services:
+  site:
+    build: .
+    container_name: emma
+    restart: always
+    healthcheck:
+      test: curl --fail -s http://localhost:5174
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    labels:
+      - traefik.enable=true
+      # Service
+      - traefik.http.services.emma.loadbalancer.server.port=5174
+      # Router
+      - traefik.http.routers.emma.rule=Host(`diver-gent.ugent.be`, `emma.ugent.be`)
+      - traefik.http.routers.emma.service=emma
+      - traefik.http.routers.emma.entrypoints=https
+      - traefik.http.routers.emma.tls=true
+      - traefik.http.routers.emma.tls.certresolver=letsencrypt
+    networks:
+      - traefik_proxy
+
+  mahi-dashboard:
+    build:
+      context: ./mahi-dashboard
+    container_name: mahi-dashboard
+    restart: always
+    healthcheck:
+      test: curl --fail -s http://localhost:5174
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    networks:
+      - traefik_proxy
+
+  manet:
+    image: ubuntu:24.04
+    container_name: manet
+    restart: always
+    privileged: true                        # needed for sudo / raw network ops
+    network_mode: host                      # typical requirement for network tools
+    working_dir: /app
+    volumes:
+      - ./manet:/app/manet                  # the binary
+      - ./manet.conf:/app/manet.conf        # the config file
+    command: ["./manet", "--fullconf", "manet.conf"]
+
+networks:
+  traefik_proxy:
+    external: true
