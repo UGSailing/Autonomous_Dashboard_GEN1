@@ -72,6 +72,13 @@ const topicsToDisplay = ['sense-3C6D66019257/gnss/Left/pvt', 'can/ugent/tx']
 const LEFT_VIDEO_TOPIC = 'detections/video/left'
 const RIGHT_VIDEO_TOPIC = 'detections/video/right'
 
+// Page is served over HTTPS via Traefik → must use wss.
+// Falls back to the local broker during `vite dev`.
+const MQTT_URL =
+  typeof window !== 'undefined' && window.location.protocol === 'https:'
+    ? 'wss://mqtt.ugentsailing.be'
+    : 'ws://localhost:9001'
+
 // Parse $GPHDT,269.23,T*09  →  269.23  (returns null on failure)
 function parseNmeaHdt(sentence: string): number | null {
   const starIdx = sentence.indexOf('*')
@@ -265,9 +272,7 @@ function App() {
 
   // MQTT
   useEffect(() => {
-    const client = mqtt.connect('ws://localhost:9001', {
-      resubscribe: false,
-    })
+    const client = mqtt.connect(MQTT_URL, { resubscribe: false })
 
     client.on('connect', () => {
       console.log('[MQTT] connected')
