@@ -4,7 +4,7 @@ services:
     container_name: emma
     restart: always
     healthcheck:
-      test: curl --fail -s http://localhost:5174
+      test: curl --fail -s http://localhost:3000
       interval: 10s
       timeout: 10s
       retries: 5
@@ -12,7 +12,7 @@ services:
     labels:
       - traefik.enable=true
       # Service
-      - traefik.http.services.emma.loadbalancer.server.port=5174
+      - traefik.http.services.emma.loadbalancer.server.port=3000
       # Router
       - traefik.http.routers.emma.rule=Host(`diver-gent.ugent.be`, `emma.ugent.be`)
       - traefik.http.routers.emma.service=emma
@@ -28,7 +28,7 @@ services:
     container_name: mahi-dashboard
     restart: always
     healthcheck:
-      test: curl --fail -s http://localhost:5174
+      test: curl --fail -s http://localhost:3000
       interval: 10s
       timeout: 10s
       retries: 5
