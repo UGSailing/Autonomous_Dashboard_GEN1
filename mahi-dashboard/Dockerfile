@@ -7,6 +7,7 @@ RUN npx vite build
 
 FROM node:20-alpine
 WORKDIR /app
+RUN apk add --no-cache curl
 RUN npm install -g serve
 COPY --from=builder /app/dist ./dist
 EXPOSE 3145

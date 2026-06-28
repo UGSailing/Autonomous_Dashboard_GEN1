@@ -4,18 +4,18 @@ services:
       context: ./mahi-dashboard
     container_name: mahi-dashboard
     restart: always
-    # healthcheck:
-    #   test: curl --fail -s http://localhost:3145
-    #   interval: 10s
-    #   timeout: 10s
-    #   retries: 5
-    #   start_period: 120s
+    healthcheck:
+      test: curl --fail -s http://localhost:3145
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     labels:
       - traefik.enable=true
       # Service
       - traefik.http.services.emma.loadbalancer.server.port=3145
       # Router
-      - traefik.http.routers.emma.rule=Host(`emma.vop.ugentsailing.be`)
+      - traefik.http.routers.emma.rule=Host(`emma.ugentsailing.be`)
       - traefik.http.routers.emma.service=emma
       - traefik.http.routers.emma.entrypoints=https
       - traefik.http.routers.emma.tls=true
