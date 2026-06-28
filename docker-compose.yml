@@ -20,6 +20,7 @@ services:
       - traefik.http.routers.emma.entrypoints=https
       - traefik.http.routers.emma.tls=true
       - traefik.http.routers.emma.tls.certresolver=letsencrypt
+      - traefik.http.routers.emma.middlewares=hsts@file
     networks:
       - traefik_proxy
 
