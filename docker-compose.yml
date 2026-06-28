@@ -24,16 +24,16 @@ services:
       - traefik_proxy
 
   manet:
-    image: ubuntu:24.04
+    build:
+      context: .
+      dockerfile: manet.Dockerfile
     container_name: manet
     restart: always
-    privileged: true                        # needed for sudo / raw network ops
-    network_mode: host                      # typical requirement for network tools
-    working_dir: /app
+    privileged: true
+    network_mode: host
     volumes:
-      - ./manet:/app/manet                  # the binary
-      - ./manet.conf:/app/manet.conf        # the config file
-    command: ["./manet", "--fullconf", "manet.conf"]
+      - ./manet:/app/manet
+      - ./manet.conf:/app/manet.conf
 
 networks:
   traefik_proxy:
