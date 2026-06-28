@@ -1,0 +1,7 @@
+emma.ugentsailing.be {
+    reverse_proxy mahi-dashboard:3145
+}
+
+mqtt.ugentsailing.be {
+    reverse_proxy host.docker.internal:9001
+}

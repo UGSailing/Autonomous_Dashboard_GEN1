@@ -1,40 +1,48 @@
 services:
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web
+
   mahi-dashboard:
     build:
       context: ./mahi-dashboard
     container_name: mahi-dashboard
     restart: always
     healthcheck:
-      # node:20-alpine has no curl — use BusyBox wget
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3145"]
       interval: 10s
       timeout: 10s
       retries: 5
       start_period: 120s
-    labels:
-      - traefik.enable=true
-      - traefik.http.services.emma.loadbalancer.server.port=3145
-      - traefik.http.routers.emma.rule=Host(`emma.ugentsailing.be`)
-      - traefik.http.routers.emma.service=emma
-      - traefik.http.routers.emma.entrypoints=https
-      - traefik.http.routers.emma.tls=true
-      - traefik.http.routers.emma.tls.certresolver=letsencrypt
-      - traefik.http.routers.emma.middlewares=hsts@file
     networks:
-      - traefik_proxy
+      - web
 
   manet:
-      build:
-        context: ./manet
-        dockerfile: manet.Dockerfile
-      container_name: manet
-      restart: always
-      privileged: true
-      network_mode: host      # ← manet now sees eth0/br-5g and the real routing table
-      volumes:
-        - ./manet:/app
-      # NO networks: block, NO traefik labels — host mode can't use either
+    build:
+      context: ./manet
+      dockerfile: manet.Dockerfile
+    container_name: manet
+    restart: always
+    privileged: true
+    network_mode: host
+    volumes:
+      - ./manet:/app
 
 networks:
-  traefik_proxy:
-    external: false
+  web:
+
+volumes:
+  caddy_data:
+  caddy_config:
