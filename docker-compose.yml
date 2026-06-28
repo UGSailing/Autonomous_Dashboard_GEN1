@@ -26,14 +26,13 @@ services:
 
   manet:
     build:
-      context: .
+      context: ./manet
       dockerfile: manet.Dockerfile
     container_name: manet
     restart: always
     privileged: true
     volumes:
-      - ./manet:/app/manet
-      - ./manet.conf:/app/manet.conf
+      - ./manet:/app
 
 networks:
   traefik_proxy:
