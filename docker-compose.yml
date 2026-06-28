@@ -24,25 +24,27 @@ services:
       - traefik_proxy
 
   manet:
-    build:
-      context: ./manet
-      dockerfile: manet.Dockerfile
-    container_name: manet
-    restart: always
-    privileged: true
-    volumes:
-      - ./manet:/app
-    labels:
-      - traefik.enable=true
-      # Point Traefik at mosquitto's websockets listener (NOT 1883)
-      - traefik.http.services.manet-mqtt.loadbalancer.server.port=9001
-      - traefik.http.routers.manet-mqtt.rule=Host(`mqtt.ugentsailing.be`)
-      - traefik.http.routers.manet-mqtt.service=manet-mqtt
-      - traefik.http.routers.manet-mqtt.entrypoints=https
-      - traefik.http.routers.manet-mqtt.tls=true
-      - traefik.http.routers.manet-mqtt.tls.certresolver=letsencrypt
-    networks:
-      - traefik_proxy
+      build:
+        context: ./manet
+        dockerfile: manet.Dockerfile
+      container_name: manet
+      restart: always
+      privileged: true
+      sysctls:
+        - net.ipv6.conf.all.disable_ipv6=1
+        - net.ipv6.conf.default.disable_ipv6=1
+      volumes:
+        - ./manet:/app
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.manet-mqtt.loadbalancer.server.port=9001
+        - traefik.http.routers.manet-mqtt.rule=Host(`mqtt.ugentsailing.be`)
+        - traefik.http.routers.manet-mqtt.service=manet-mqtt
+        - traefik.http.routers.manet-mqtt.entrypoints=https
+        - traefik.http.routers.manet-mqtt.tls=true
+        - traefik.http.routers.manet-mqtt.tls.certresolver=letsencrypt
+      networks:
+        - traefik_proxy
 
 networks:
   traefik_proxy:
