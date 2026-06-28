@@ -5,7 +5,7 @@ services:
     container_name: mahi-dashboard
     restart: always
     healthcheck:
-      test: curl --fail -s http://localhost:3000
+      test: curl --fail -s http://localhost:3145
       interval: 10s
       timeout: 10s
       retries: 5
