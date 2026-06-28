@@ -30,22 +30,11 @@ services:
       container_name: manet
       restart: always
       privileged: true
-      sysctls:
-        - net.ipv6.conf.all.disable_ipv6=1
-        - net.ipv6.conf.default.disable_ipv6=1
+      network_mode: host      # ← manet now sees eth0/br-5g and the real routing table
       volumes:
         - ./manet:/app
-      labels:
-        - traefik.enable=true
-        - traefik.http.services.manet-mqtt.loadbalancer.server.port=9001
-        - traefik.http.routers.manet-mqtt.rule=Host(`mqtt.ugentsailing.be`)
-        - traefik.http.routers.manet-mqtt.service=manet-mqtt
-        - traefik.http.routers.manet-mqtt.entrypoints=https
-        - traefik.http.routers.manet-mqtt.tls=true
-        - traefik.http.routers.manet-mqtt.tls.certresolver=letsencrypt
-      networks:
-        - traefik_proxy
+      # NO networks: block, NO traefik labels — host mode can't use either
 
 networks:
   traefik_proxy:
-    external: true
+    external: false
