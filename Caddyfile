@@ -3,6 +3,5 @@ emma.ugentsailing.be {
 }
 
 mqtt.ugentsailing.be {
-    reverse_proxy host.docker.internal:9001 {
-        flush_interval -1
-}}
+    reverse_proxy host.docker.internal:9001
+}
