@@ -279,7 +279,9 @@ function App() {
       client.subscribe('#')
     })
 
+
     client.on('message', (topic, message) => {
+      console.log('[MQTT] RX:', topic, '(', message.length, 'bytes )')  // ← add this
       // ── Binary video frames — render immediately, no buffering ────────────
       // Frames are converted to object URLs and displayed as soon as they
       // arrive. The previous URL is revoked immediately to free memory.
